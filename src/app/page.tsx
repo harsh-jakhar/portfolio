@@ -1,69 +1,73 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { getFeaturedProjects } from "@/lib/projects";
+import { getAllNotes } from "@/lib/notes";
+import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { Hero } from "@/components/home/Hero";
+import { NowStrip } from "@/components/home/NowStrip";
+import { ContactCta } from "@/components/home/ContactCta";
+import { ProjectCard } from "@/components/projects/ProjectCard";
+import { NoteCard } from "@/components/notes/NoteCard";
+import { Reveal } from "@/components/motion/Reveal";
 
-export default function Home() {
+/** Home page: hero, "now" strip, featured projects, latest notes, contact CTA. */
+export default function HomePage() {
+  const featured = getFeaturedProjects();
+  const latestNotes = getAllNotes().slice(0, 3);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <>
+      <Hero />
+      <NowStrip />
+
+      <Container>
+        <Section
+          eyebrow="Selected work"
+          title="Featured projects"
+          intro="Two projects that show how I use language models and build web apps."
+        >
+          <ul className="grid gap-5 sm:grid-cols-2">
+            {featured.map((p, i) => (
+              <Reveal key={p.slug} as="li" delay={i * 0.08}>
+                <ProjectCard project={p} />
+              </Reveal>
+            ))}
+          </ul>
+          <SeeAll href="/projects" label="All projects" />
+        </Section>
+
+        <Section
+          eyebrow="Learning log"
+          title="Latest notes"
+          intro="Short write-ups on what I learn while evaluating and working with LLMs."
+          className="border-t border-border"
+        >
+          <div className="divide-y divide-border">
+            {latestNotes.map((n, i) => (
+              <Reveal key={n.slug} delay={i * 0.06}>
+                <NoteCard note={n} />
+              </Reveal>
+            ))}
+          </div>
+          <SeeAll href="/notes" label="All notes" />
+        </Section>
+
+        <ContactCta />
+      </Container>
+    </>
+  );
+}
+
+function SeeAll({ href, label }: { href: string; label: string }) {
+  return (
+    <div className="mt-8">
+      <Link
+        href={href}
+        className="inline-flex items-center gap-1.5 font-mono text-sm text-muted transition-colors hover:text-accent"
+      >
+        {label} <ArrowRight className="h-4 w-4" aria-hidden />
+      </Link>
     </div>
   );
 }
